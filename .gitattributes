@@ -1,0 +1,5 @@
+# Normalise to LF so scripts and configs behave the same inside Linux containers.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

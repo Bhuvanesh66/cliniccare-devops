@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.db
+
+# Node
+node_modules/
+dist/
+
+# Secrets and local configuration - never committed
+.env
+.env.*
+!.env.example
+*.pem
+kubeconfig*
+
+# Terraform: state holds resource IDs and can hold secrets; keep the lock file
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+*.tfplan
+tfplan
+crash.log
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local tooling (screenshot browser, scratch output)
+.tools/
