@@ -17,6 +17,11 @@ updates:
   - package-ecosystem: docker
     directories: [/backend, /frontend]
     schedule: { interval: weekly }
+    ignore:
+      # Node majors alternate between LTS and short-lived releases; move to
+      # the next LTS line deliberately rather than on every major.
+      - dependency-name: node
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
