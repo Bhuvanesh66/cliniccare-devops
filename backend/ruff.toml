@@ -1,0 +1,15 @@
+line-length = 100
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "S"]
+# S101: asserts are how pytest works; B008: FastAPI's Query() defaults are idiomatic.
+ignore = ["B008"]
+
+[lint.per-file-ignores]
+"tests/**" = ["S101"]
+"app/seed.py" = ["S311"]  # demo data, not cryptography
+
+[lint.isort]
+# backend/alembic/ holds migrations; the alembic import is the library.
+known-third-party = ["alembic"]
