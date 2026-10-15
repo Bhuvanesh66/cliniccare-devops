@@ -1,0 +1,70 @@
+# kube-prometheus-stack (Prometheus Operator + Prometheus + Grafana +
+# kube-state-metrics + node-exporter), sized for a 3 x t3.medium lab cluster.
+#
+#   helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+#     --version 92.8.0 -n monitoring --create-namespace -f monitoring/kube-prometheus-stack-values.yaml
+#
+# scripts/bootstrap-cluster.sh runs this for you.
+
+# EKS runs the control plane for us; its etcd, scheduler and controller-manager
+# can't be scraped, so leave those jobs out instead of showing them as DOWN.
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+# Alerts are evaluated by Prometheus (visible on its Alerts page); no
+# notification routing is needed for the lab.
+alertmanager:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    # Pick up ServiceMonitors / rules from every namespace, not only this release.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    scrapeInterval: 15s
+    evaluationInterval: 15s
+    retention: 2d
+    resources:
+      requests: { cpu: 200m, memory: 512Mi }
+      limits: { memory: 1536Mi }
+
+grafana:
+  # Admin credentials live in a Secret created by the bootstrap script with a
+  # random password; nothing is hard-coded here.
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  defaultDashboardsTimezone: browser
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      # The ClinicCare dashboard ConfigMap lives in the app namespace.
+      searchNamespace: ALL
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 384Mi }
+
+prometheusOperator:
+  resources:
+    requests: { cpu: 50m, memory: 96Mi }
+    limits: { memory: 256Mi }
+
+kube-state-metrics:
+  resources:
+    requests: { cpu: 20m, memory: 64Mi }
+    limits: { memory: 192Mi }
+
+prometheus-node-exporter:
+  resources:
+    requests: { cpu: 20m, memory: 32Mi }
+    limits: { memory: 64Mi }

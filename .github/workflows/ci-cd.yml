@@ -75,6 +75,40 @@ jobs:
       - run: npm run format:check
       - run: npm run build
 
+  infrastructure:
+    name: Infrastructure - validate Terraform, Helm and manifests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+
+      - name: Terraform fmt and validate
+        working-directory: terraform
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.0
+
+      - name: Helm lint and render
+        run: |
+          helm lint helm/cliniccare --set image.tag=ci -f helm/cliniccare/values-prod.yaml
+          helm template cliniccare helm/cliniccare -n cliniccare --set image.tag=ci \
+            -f helm/cliniccare/values-prod.yaml > rendered.yaml
+
+      - name: Validate manifests against the Kubernetes 1.36 schemas
+        run: |
+          { cat rendered.yaml; for f in k8s/*.yaml scripts/load-test-job.yaml; do printf '\n---\n'; cat "$f"; done; } |
+            docker run -i --rm ghcr.io/yannh/kubeconform:v0.8.0@sha256:faffaf43f95aa6425306e1ab8d6fcad72acb9049158f38e574c085ea1ec0f64e \
+              -strict -summary -kubernetes-version 1.36.0 -ignore-missing-schemas -
+
   images:
     name: Image - ${{ matrix.component }} (build, scan, push)
     needs: [backend, frontend]
@@ -135,3 +169,74 @@ jobs:
         run: |
           docker push "$IMAGE:$GITHUB_SHA"
           echo "Pushed \`$IMAGE:$GITHUB_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # Runs only while the EKS cluster exists: scripts/configure-github.sh sets
+  # DEPLOY_ENABLED=true after `terraform apply` and false after teardown.
+  deploy:
+    name: Deploy to EKS
+    needs: [images, infrastructure]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write # GitHub OIDC token -> short-lived AWS credentials, no stored keys
+    environment:
+      name: production
+      url: ${{ steps.smoke.outputs.url }}
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: cliniccare-deploy-${{ github.run_id }}
+
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.0
+
+      - name: Connect kubectl to the cluster
+        run: aws eks update-kubeconfig --name "${{ vars.EKS_CLUSTER_NAME }}" --region "${{ vars.AWS_REGION }}"
+
+      # --rollback-on-failure: if the new pods never become ready, Helm restores
+      # the previous release, so a bad build can't stay deployed.
+      - name: Helm upgrade
+        run: |
+          helm upgrade --install cliniccare ./helm/cliniccare \
+            --namespace cliniccare \
+            -f helm/cliniccare/values-prod.yaml \
+            --set image.registry="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}" \
+            --set image.tag="$GITHUB_SHA" \
+            --wait --rollback-on-failure --timeout 10m
+          kubectl -n cliniccare get deploy,pods,svc,ingress,hpa
+
+      - name: Smoke test through the load balancer
+        id: smoke
+        run: |
+          for _ in $(seq 1 30); do
+            host=$(kubectl -n cliniccare get ingress cliniccare -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            [ -n "$host" ] && break
+            sleep 10
+          done
+          url="http://$host"
+          echo "Waiting for $url to serve commit ${GITHUB_SHA::7}"
+          served=""
+          for _ in $(seq 1 40); do
+            served=$(curl -fsS --max-time 5 "$url/api/info" | jq -r .git_sha || true)
+            [ "$served" = "$GITHUB_SHA" ] && break
+            sleep 10
+          done
+          if [ "$served" != "$GITHUB_SHA" ]; then
+            echo "::error::$url serves '$served', expected $GITHUB_SHA"
+            exit 1
+          fi
+          curl -fsS "$url/" | grep -q "<title>ClinicCare</title>"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### Deployed \`${GITHUB_SHA::7}\` to $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Helm test
+        run: helm test cliniccare -n cliniccare --logs

@@ -1,5 +1,5 @@
 # Weekly update PRs for every dependency source: libraries, base images,
-# and GitHub Actions (SHA pins included).
+# GitHub Actions (SHA pins included) and Terraform providers and modules.
 version: 2
 updates:
   - package-ecosystem: pip
@@ -23,3 +23,7 @@ updates:
     schedule: { interval: weekly }
     groups:
       actions: { patterns: ['*'] }
+
+  - package-ecosystem: terraform
+    directory: /terraform
+    schedule: { interval: weekly }

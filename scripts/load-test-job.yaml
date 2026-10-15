@@ -1,0 +1,77 @@
+# In-cluster load generator for the HPA demo: k6 sends steady traffic to the
+# API Service, enough to push average CPU over the 60% target.
+#   kubectl apply -n cliniccare -f scripts/load-test-job.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cliniccare-load-test
+data:
+  script.js: |
+    import http from 'k6/http';
+    import { check } from 'k6';
+
+    const API = __ENV.API_URL;
+
+    export const options = {
+      scenarios: {
+        ramp: {
+          executor: 'ramping-vus',
+          stages: [
+            { duration: '1m', target: 40 },
+            { duration: '4m', target: 40 },
+            { duration: '30s', target: 0 },
+          ],
+        },
+      },
+      thresholds: { http_req_failed: ['rate<0.05'] },
+    };
+
+    export default function () {
+      // A mix of the dashboard's real calls: stats (aggregations) and lists (joins).
+      const responses = http.batch([
+        ['GET', `${API}/api/stats`],
+        ['GET', `${API}/api/appointments?limit=100`],
+        ['GET', `${API}/api/patients?q=a`],
+      ]);
+      responses.forEach((r) => check(r, { 'status is 200': (res) => res.status === 200 }));
+    }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cliniccare-load-test
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cliniccare-load-test
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 12345
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: k6
+          image: grafana/k6:2.3.0
+          args: ["run", "--quiet", "/scripts/script.js"]
+          env:
+            - name: API_URL
+              value: http://cliniccare-backend:8000
+          resources:
+            requests: { cpu: 250m, memory: 128Mi }
+            limits: { cpu: "1", memory: 512Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: script, mountPath: /scripts }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: script
+          configMap: { name: cliniccare-load-test }
+        - name: tmp
+          emptyDir: {}
