@@ -1,0 +1,22 @@
+# Copy to terraform.tfvars (git-ignored) and adjust. Every value has a default,
+# so this file is optional. Never put AWS keys here: Terraform reads
+# credentials from the AWS CLI profile / environment.
+
+region             = "ap-south-1"
+project            = "cliniccare"
+environment        = "dev"
+vpc_cidr           = "10.20.0.0/16"
+kubernetes_version = "1.36"
+
+node_instance_types = ["t3.medium"]
+node_group_size = {
+  min     = 2
+  desired = 3
+  max     = 4
+}
+
+github_repository  = "Bhuvanesh66/cliniccare-devops"
+github_environment = "production"
+
+# Set to false if the AWS account already has the GitHub Actions OIDC provider.
+create_github_oidc_provider = true

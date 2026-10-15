@@ -1,0 +1,82 @@
+Terraform used the selected providers to generate the following execution plan.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions (resource addresses; full detail in docs/evidence/terraform-plan.txt):
+
+  + aws_eks_pod_identity_association.lb_controller
+  + aws_iam_openid_connect_provider.github[0]
+  + aws_iam_policy.lb_controller
+  + aws_iam_role.ebs_csi
+  + aws_iam_role.eks_admin
+  + aws_iam_role.github_deploy
+  + aws_iam_role.lb_controller
+  + aws_iam_role_policy.eks_admin_describe
+  + aws_iam_role_policy.github_deploy_describe
+  + aws_iam_role_policy_attachment.ebs_csi
+  + aws_iam_role_policy_attachment.lb_controller
+  + aws_iam_user.operator
+  + aws_iam_user_policy.operator
+  + aws_iam_user_policy_attachment.operator_view_only
+  + module.eks.aws_eks_access_entry.this["eks_admin"]
+  + module.eks.aws_eks_access_entry.this["github_deploy"]
+  + module.eks.aws_eks_access_policy_association.this["eks_admin_cluster_admin"]
+  + module.eks.aws_eks_access_policy_association.this["github_deploy_namespace_admin"]
+  + module.eks.aws_eks_addon.before_compute["eks-pod-identity-agent"]
+  + module.eks.aws_eks_addon.before_compute["vpc-cni"]
+  + module.eks.aws_eks_addon.this["aws-ebs-csi-driver"]
+  + module.eks.aws_eks_addon.this["coredns"]
+  + module.eks.aws_eks_addon.this["kube-proxy"]
+  + module.eks.aws_eks_addon.this["metrics-server"]
+  + module.eks.aws_eks_cluster.this[0]
+  + module.eks.aws_iam_policy.cluster_encryption[0]
+  + module.eks.aws_iam_role.this[0]
+  + module.eks.aws_iam_role_policy_attachment.cluster_encryption[0]
+  + module.eks.aws_iam_role_policy_attachment.this["AmazonEKSClusterPolicy"]
+  + module.eks.aws_security_group.cluster[0]
+  + module.eks.aws_security_group.node[0]
+  + module.eks.aws_security_group_rule.cluster["ingress_nodes_443"]
+  + module.eks.aws_security_group_rule.node["egress_all"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_10251_webhook"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_443"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_6443_webhook"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_8443_webhook"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]
+  + module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]
+  + module.eks.aws_security_group_rule.node["ingress_nodes_ephemeral"]
+  + module.eks.aws_security_group_rule.node["ingress_self_coredns_tcp"]
+  + module.eks.aws_security_group_rule.node["ingress_self_coredns_udp"]
+  + module.eks.time_sleep.this[0]
+  + module.vpc.aws_default_network_acl.this[0]
+  + module.vpc.aws_default_route_table.default[0]
+  + module.vpc.aws_default_security_group.this[0]
+  + module.vpc.aws_eip.nat[0]
+  + module.vpc.aws_internet_gateway.this[0]
+  + module.vpc.aws_nat_gateway.this[0]
+  + module.vpc.aws_route.private_nat_gateway[0]
+  + module.vpc.aws_route.public_internet_gateway[0]
+  + module.vpc.aws_route_table.private[0]
+  + module.vpc.aws_route_table.public[0]
+  + module.vpc.aws_route_table_association.private[0]
+  + module.vpc.aws_route_table_association.private[1]
+  + module.vpc.aws_route_table_association.public[0]
+  + module.vpc.aws_route_table_association.public[1]
+  + module.vpc.aws_subnet.private[0]
+  + module.vpc.aws_subnet.private[1]
+  + module.vpc.aws_subnet.public[0]
+  + module.vpc.aws_subnet.public[1]
+  + module.vpc.aws_vpc.this[0]
+  + module.eks.module.eks_managed_node_group["general"].aws_eks_node_group.this[0]
+  + module.eks.module.eks_managed_node_group["general"].aws_iam_role.this[0]
+  + module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.this["AmazonEC2ContainerRegistryReadOnly"]
+  + module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.this["AmazonEKSWorkerNodePolicy"]
+  + module.eks.module.eks_managed_node_group["general"].aws_iam_role_policy_attachment.this["AmazonEKS_CNI_Policy"]
+  + module.eks.module.eks_managed_node_group["general"].aws_launch_template.this[0]
+  + module.eks.module.kms.aws_kms_alias.this["cluster"]
+  + module.eks.module.kms.aws_kms_key.this[0]
+  + module.eks.module.eks_managed_node_group["general"].module.user_data.null_resource.validate_cluster_service_cidr
+
+Plan: 72 to add, 0 to change, 0 to destroy.
+
+Saved the plan to: tfplan
