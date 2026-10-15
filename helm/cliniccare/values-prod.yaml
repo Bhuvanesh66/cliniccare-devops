@@ -1,0 +1,23 @@
+# AWS EKS: public Application Load Balancer through the AWS Load Balancer
+# Controller, monitoring through kube-prometheus-stack.
+
+app:
+  environment: eks-production
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    # Send traffic straight to pod IPs (no NodePort hop).
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/load-balancer-name: cliniccare
+    alb.ingress.kubernetes.io/tags: Project=cliniccare,ManagedBy=aws-load-balancer-controller
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+  alertRules:
+    enabled: true
+  grafanaDashboard:
+    enabled: true

@@ -1,0 +1,17 @@
+# Local test cluster (kind): images are loaded with `kind load docker-image`,
+# so they are never pulled from a registry.
+
+image:
+  registry: cliniccare
+  tag: local
+  pullPolicy: Never
+
+app:
+  environment: kind
+
+ingress:
+  enabled: false
+
+# kind has no metrics-server by default.
+hpa:
+  enabled: false

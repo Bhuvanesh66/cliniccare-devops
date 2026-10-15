@@ -1,0 +1,69 @@
+{{- $fullname := include "cliniccare.fullname" . -}}
+{{- if .Values.monitoring.serviceMonitor.enabled }}
+---
+# Tells the Prometheus Operator to scrape the API's /metrics endpoint.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $fullname }}-backend
+  labels:
+    {{- include "cliniccare.labels" . | nindent 4 }}
+    {{- toYaml .Values.monitoring.serviceMonitor.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "cliniccare.selectorLabels" (dict "ctx" . "component" "backend") | nindent 6 }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.monitoring.serviceMonitor.interval }}
+{{- end }}
+{{- if .Values.monitoring.alertRules.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $fullname }}-alerts
+  labels:
+    {{- include "cliniccare.labels" . | nindent 4 }}
+    {{- toYaml .Values.monitoring.serviceMonitor.labels | nindent 4 }}
+spec:
+  groups:
+    - name: cliniccare.rules
+      rules:
+        - alert: ClinicCareApiDown
+          expr: sum(up{namespace="{{ .Release.Namespace }}", service="{{ $fullname }}-backend"}) == 0
+          for: 2m
+          labels: { severity: critical }
+          annotations:
+            summary: No ClinicCare API pod is being scraped successfully.
+        - alert: ClinicCareHighErrorRate
+          expr: |
+            sum(rate(http_requests_total{namespace="{{ .Release.Namespace }}", status="5xx"}[5m]))
+              / clamp_min(sum(rate(http_requests_total{namespace="{{ .Release.Namespace }}"}[5m])), 1e-9) > 0.05
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: More than 5% of API requests are failing with 5xx.
+        - alert: ClinicCareSlowResponses
+          expr: |
+            histogram_quantile(0.95, sum by (le) (rate(http_request_duration_highr_seconds_bucket{namespace="{{ .Release.Namespace }}"}[5m]))) > 1
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: 95th percentile API latency is above 1 second.
+{{- end }}
+{{- if .Values.monitoring.grafanaDashboard.enabled }}
+---
+# The Grafana sidecar (kube-prometheus-stack) imports ConfigMaps with this label.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullname }}-dashboard
+  labels:
+    {{- include "cliniccare.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  cliniccare.json: |-
+    {{- .Files.Get "dashboards/cliniccare.json" | replace "__NAMESPACE__" .Release.Namespace | nindent 4 }}
+{{- end }}

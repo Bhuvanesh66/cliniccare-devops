@@ -1,0 +1,40 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullname := include "cliniccare.fullname" . -}}
+# One entry point: /api goes to the FastAPI backend, everything else to the React UI.
+# An Ingress is only configuration; the controller (AWS Load Balancer Controller on
+# EKS) turns it into a real load balancer.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullname }}
+  labels:
+    {{- include "cliniccare.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    - {{- with .Values.ingress.host }}
+      host: {{ . | quote }}
+      {{- end }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullname }}-backend
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullname }}-frontend
+                port:
+                  name: http
+{{- end }}

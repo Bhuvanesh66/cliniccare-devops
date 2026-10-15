@@ -1,0 +1,85 @@
+# Default values. Environment files (values-prod.yaml, values-kind.yaml)
+# override only what differs.
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  # Images are <registry>/cliniccare-backend:<tag> and <registry>/cliniccare-frontend:<tag>.
+  registry: ghcr.io/bhuvanesh66
+  # The commit SHA, set by the pipeline (--set image.tag=$GITHUB_SHA). Required.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+app:
+  environment: production
+  clinicTimezone: Asia/Kolkata
+  # Load demo doctors, patients and appointments into an empty database.
+  seedDemoData: true
+
+backend:
+  replicas: 2 # ignored while the HPA is enabled; the HPA owns the replica count
+  port: 8000
+  resources:
+    requests: { cpu: 100m, memory: 160Mi }
+    limits: { cpu: 500m, memory: 384Mi }
+  # Per-target-group health check for the AWS Load Balancer Controller.
+  serviceAnnotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+
+frontend:
+  replicas: 2
+  port: 8080
+  resources:
+    requests: { cpu: 25m, memory: 32Mi }
+    limits: { cpu: 200m, memory: 128Mi }
+  serviceAnnotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+
+postgres:
+  image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+  database: cliniccare
+  username: cliniccare
+  # Leave empty: a random password is generated on first install and kept on upgrades.
+  password: ""
+  storage: 5Gi
+  storageClassName: "" # cluster default (gp3 on EKS, standard on kind)
+  # Delete the volume on `helm uninstall` so teardown leaves no orphaned EBS disks.
+  deleteVolumeOnUninstall: true
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+ingress:
+  enabled: false
+  className: ""
+  host: "" # empty = answer on any host name (e.g. the load balancer's DNS name)
+  annotations: {}
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 60
+
+podDisruptionBudget:
+  enabled: true
+
+# Only the backend may open connections to PostgreSQL.
+networkPolicy:
+  enabled: true
+
+monitoring:
+  # Needs the Prometheus Operator CRDs (kube-prometheus-stack).
+  serviceMonitor:
+    enabled: false
+    interval: 15s
+    labels:
+      release: kube-prometheus-stack
+  alertRules:
+    enabled: false
+  # ConfigMap picked up by the Grafana dashboard sidecar.
+  grafanaDashboard:
+    enabled: false

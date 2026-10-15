@@ -1,0 +1,45 @@
+{{- $fullname := include "cliniccare.fullname" . -}}
+# `helm test cliniccare -n cliniccare` - checks the release from inside the cluster.
+# Reuses the backend image (it has Python), so no extra image is pulled.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ $fullname }}-smoke-test
+  labels:
+    {{- include "cliniccare.componentLabels" (dict "ctx" . "component" "test") | nindent 4 }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  restartPolicy: Never
+  securityContext:
+    {{- include "cliniccare.podSecurityContext" . | nindent 4 }}
+    runAsUser: 10001
+  containers:
+    - name: smoke-test
+      image: {{ include "cliniccare.image" (dict "ctx" . "component" "backend") }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      env:
+        - name: BACKEND
+          value: http://{{ $fullname }}-backend:{{ .Values.backend.port }}
+        - name: FRONTEND
+          value: http://{{ $fullname }}-frontend
+      command:
+        - python
+        - -c
+        - |
+          import json, os, urllib.request
+          def get(url):
+              with urllib.request.urlopen(url, timeout=10) as r:
+                  body = r.read().decode()
+                  print(f"{r.status} {url}")
+                  return body
+          backend, frontend = os.environ["BACKEND"], os.environ["FRONTEND"]
+          assert json.loads(get(f"{backend}/ready"))["status"] == "READY"
+          stats = json.loads(get(f"{backend}/api/stats"))
+          print(f"  {stats['active_doctors']} doctors, {stats['patients']} patients")
+          assert "<title>ClinicCare</title>" in get(f"{frontend}/")
+          assert json.loads(get(f"{frontend}/api/info"))["service"] == "ClinicCare API"
+          print("smoke test passed")
+      securityContext:
+        {{- include "cliniccare.containerSecurityContext" . | nindent 8 }}

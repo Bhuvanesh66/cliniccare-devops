@@ -1,0 +1,13 @@
+# Namespace for the ClinicCare release. Pod Security Admission enforces the
+# "restricted" profile: every pod must run as non-root, drop all Linux
+# capabilities and use the default seccomp profile.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cliniccare
+  labels:
+    app.kubernetes.io/part-of: cliniccare
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

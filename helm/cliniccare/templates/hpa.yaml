@@ -1,0 +1,28 @@
+{{- if .Values.hpa.enabled -}}
+# Scales the API on CPU. Needs CPU requests on the pods and a metrics provider
+# (metrics-server, installed as an EKS add-on by Terraform).
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "cliniccare.fullname" . }}-backend
+  labels:
+    {{- include "cliniccare.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "cliniccare.fullname" . }}-backend
+  minReplicas: {{ .Values.hpa.minReplicas }}
+  maxReplicas: {{ .Values.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.hpa.targetCPUUtilizationPercentage }}
+  behavior:
+    scaleDown:
+      # Wait before removing pods so short dips in traffic don't cause flapping.
+      stabilizationWindowSeconds: 120
+{{- end }}
