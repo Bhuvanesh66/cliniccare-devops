@@ -1,0 +1,31 @@
+# Scenario 4 - a typo in the start command (app.mian instead of app.main).
+# Symptom: the container exits immediately and restarts with growing
+# back-off: CrashLoopBackOff.
+# IMAGE is replaced with the currently deployed backend image by run-scenario.sh.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-crashloop
+  labels: { lab: troubleshooting }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: broken-crashloop }
+  template:
+    metadata:
+      labels: { app: broken-crashloop, lab: troubleshooting }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: api
+          image: IMAGE
+          command: ["uvicorn", "app.mian:app", "--host", "0.0.0.0", "--port", "8000"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          resources:
+            requests: { cpu: 10m, memory: 64Mi }

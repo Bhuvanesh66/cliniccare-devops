@@ -1,0 +1,16 @@
+# Scenario 2 - a Service whose selector matches no pods.
+# The API pods are labelled app.kubernetes.io/component=backend, not "api".
+# Symptom: the Service exists, but has no endpoints, so every request fails.
+apiVersion: v1
+kind: Service
+metadata:
+  name: broken-service
+  labels: { lab: troubleshooting }
+spec:
+  selector:
+    app.kubernetes.io/name: cliniccare
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

@@ -1,0 +1,40 @@
+# Scenario 3 - the API starts, but its database host is wrong.
+# /health (liveness) passes, /ready (readiness) returns 503, so the pod is
+# Running but never Ready and Kubernetes sends it no traffic.
+# IMAGE is replaced with the currently deployed backend image by run-scenario.sh.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-readiness
+  labels: { lab: troubleshooting }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: broken-readiness }
+  template:
+    metadata:
+      labels: { app: broken-readiness, lab: troubleshooting }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: api
+          image: IMAGE
+          env:
+            - name: DATABASE_URL
+              value: postgresql+psycopg://cliniccare:wrong@cliniccare-postgress:5432/cliniccare
+          ports:
+            - { name: http, containerPort: 8000 }
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+          readinessProbe:
+            httpGet: { path: /ready, port: http }
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          resources:
+            requests: { cpu: 10m, memory: 96Mi }

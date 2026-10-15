@@ -1,0 +1,24 @@
+# Scenario 5 - a Deployment whose pods would run as root.
+# The cliniccare namespace enforces the "restricted" Pod Security Standard,
+# so the Deployment is created but its ReplicaSet cannot create any pod.
+# Symptom: READY 0/1, no pods at all, and a FailedCreate event.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-pod-security
+  labels: { lab: troubleshooting }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: broken-pod-security }
+  template:
+    metadata:
+      labels: { app: broken-pod-security, lab: troubleshooting }
+    spec:
+      containers:
+        - name: shell
+          image: busybox:1.37
+          command: ["sleep", "3600"]
+          securityContext:
+            runAsUser: 0
+            privileged: true
