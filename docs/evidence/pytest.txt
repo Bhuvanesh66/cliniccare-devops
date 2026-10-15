@@ -1,0 +1,45 @@
+[1m============================= test session starts =============================[0m
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.7.0 -- B:\Trimester-9\DevOps\DevOps-Final-Project\backend\.venv\Scripts\python.exe
+rootdir: B:\Trimester-9\DevOps\DevOps-Final-Project\backend
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.15.1, cov-7.1.0
+[1mcollecting ... [0mcollected 35 items
+
+tests/test_appointments.py::test_book_appointment [32mPASSED[0m[32m                 [  2%][0m
+tests/test_appointments.py::test_booking_unknown_patient_returns_404 [32mPASSED[0m[32m [  5%][0m
+tests/test_appointments.py::test_inactive_doctor_cannot_be_booked [32mPASSED[0m[32m [  8%][0m
+tests/test_appointments.py::test_doctor_double_booking_is_rejected [32mPASSED[0m[32m [ 11%][0m
+tests/test_appointments.py::test_patient_double_booking_is_rejected [32mPASSED[0m[32m [ 14%][0m
+tests/test_appointments.py::test_back_to_back_slots_are_allowed [32mPASSED[0m[32m   [ 17%][0m
+tests/test_appointments.py::test_cancelled_slot_can_be_rebooked [32mPASSED[0m[32m   [ 20%][0m
+tests/test_appointments.py::test_status_workflow [32mPASSED[0m[32m                  [ 22%][0m
+tests/test_appointments.py::test_unknown_status_fails_validation [32mPASSED[0m[32m  [ 25%][0m
+tests/test_appointments.py::test_reschedule_appointment [32mPASSED[0m[32m           [ 28%][0m
+tests/test_appointments.py::test_completed_appointment_cannot_be_rescheduled [32mPASSED[0m[32m [ 31%][0m
+tests/test_appointments.py::test_list_filters [32mPASSED[0m[32m                     [ 34%][0m
+tests/test_appointments.py::test_delete_appointment [32mPASSED[0m[32m               [ 37%][0m
+tests/test_doctors.py::test_create_and_fetch_doctor [32mPASSED[0m[32m               [ 40%][0m
+tests/test_doctors.py::test_duplicate_email_is_rejected [32mPASSED[0m[32m           [ 42%][0m
+tests/test_doctors.py::test_invalid_email_and_phone_fail_validation [32mPASSED[0m[32m [ 45%][0m
+tests/test_doctors.py::test_filter_by_active_and_specialty [32mPASSED[0m[32m        [ 48%][0m
+tests/test_doctors.py::test_update_doctor [32mPASSED[0m[32m                         [ 51%][0m
+tests/test_doctors.py::test_delete_doctor_without_appointments [32mPASSED[0m[32m    [ 54%][0m
+tests/test_doctors.py::test_doctor_with_appointments_cannot_be_deleted [32mPASSED[0m[32m [ 57%][0m
+tests/test_migrations.py::test_migrations_match_models [32mPASSED[0m[32m            [ 60%][0m
+tests/test_migrations.py::test_migrations_downgrade_and_upgrade_again [32mPASSED[0m[32m [ 62%][0m
+tests/test_patients.py::test_create_patient_returns_age [32mPASSED[0m[32m           [ 65%][0m
+tests/test_patients.py::test_birth_date_in_future_is_rejected [32mPASSED[0m[32m     [ 68%][0m
+tests/test_patients.py::test_search_by_name_or_phone [32mPASSED[0m[32m              [ 71%][0m
+tests/test_patients.py::test_update_and_delete_patient [32mPASSED[0m[32m            [ 74%][0m
+tests/test_patients.py::test_missing_patient_returns_404 [32mPASSED[0m[32m          [ 77%][0m
+tests/test_seed.py::test_seed_is_idempotent_and_never_double_books [32mPASSED[0m[32m [ 80%][0m
+tests/test_service.py::test_health_is_up [32mPASSED[0m[32m                          [ 82%][0m
+tests/test_service.py::test_ready_checks_migrated_database [32mPASSED[0m[32m        [ 85%][0m
+tests/test_service.py::test_root_and_info_identify_the_service [32mPASSED[0m[32m    [ 88%][0m
+tests/test_service.py::test_metrics_expose_http_and_business_counters [32mPASSED[0m[32m [ 91%][0m
+tests/test_service.py::test_openapi_lists_all_resources [32mPASSED[0m[32m           [ 94%][0m
+tests/test_stats.py::test_stats_on_empty_database [32mPASSED[0m[32m                 [ 97%][0m
+tests/test_stats.py::test_stats_count_today_and_doctor_load [32mPASSED[0m[32m       [100%][0m
+
+[32m============================= [32m[1m35 passed[0m[32m in 3.23s[0m[32m ==============================[0m

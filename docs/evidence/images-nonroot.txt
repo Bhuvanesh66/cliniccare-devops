@@ -1,0 +1,8 @@
+REPOSITORY                              TAG                      SIZE
+cliniccare-frontend                     local                    90.5MB
+cliniccare-backend                      local                    331MB
+
+$ docker compose exec backend id
+uid=10001(app) gid=999(app) groups=999(app)
+$ docker compose exec frontend id
+uid=101(nginx) gid=101(nginx) groups=101(nginx)

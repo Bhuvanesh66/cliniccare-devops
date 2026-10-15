@@ -1,0 +1,8 @@
+$ curl -s localhost:8000/health
+{"status":"UP"}
+$ curl -s localhost:8000/ready
+{"status":"READY"}
+$ curl -s -X POST localhost:8000/api/patients -H "Content-Type: application/json" -d {...}
+{"full_name":"Demo Patient","date_of_birth":"1997-04-12","gender":"OTHER","phone":"+91 90000 55555","email":null,"id":13,"created_at":"2026-10-15T13:32:42.204744Z","age":29}
+$ curl -s "localhost:3000/api/doctors?specialty=Cardiology"   # through the nginx proxy
+[{"full_name":"Dr. Ananya Rao","specialty":"Cardiology","email":"ananya.rao@cliniccare.example","phone":"+91 98450 10010","room":"101","is_active":true,"id":1,"created_at":"2026-10-15T13:22:15.486758Z"}]

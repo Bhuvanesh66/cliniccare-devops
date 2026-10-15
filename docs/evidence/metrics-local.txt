@@ -1,0 +1,5 @@
+# HELP cliniccare_appointments_booked_total Appointments booked, by doctor specialty.
+# HELP cliniccare_appointment_status_changes_total Appointment status transitions, by the new status.
+# HELP http_requests_total Total number of requests by method, status and handler.
+http_requests_total{handler="/api/patients",method="POST",status="2xx"} 1.0
+http_requests_total{handler="/api/doctors",method="GET",status="2xx"} 1.0

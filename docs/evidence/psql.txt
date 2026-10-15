@@ -1,0 +1,30 @@
+               List of relations
+ Schema |      Name       | Type  |   Owner    
+--------+-----------------+-------+------------
+ public | alembic_version | table | cliniccare
+ public | appointments    | table | cliniccare
+ public | doctors         | table | cliniccare
+ public | patients        | table | cliniccare
+(4 rows)
+
+ id |     patient     |      doctor      |    starts_ist    |   status   
+----+-----------------+------------------+------------------+------------
+ 62 | Kabir Singh     | Dr. Vikram Mehta | 2026-10-15 09:00 | SCHEDULED
+ 61 | Aarav Sharma    | Dr. Arjun Iyer   | 2026-10-15 09:00 | SCHEDULED
+ 63 | Rahul Verma     | Dr. Rohan Kapoor | 2026-10-15 09:00 | SCHEDULED
+ 60 | Vivaan Malhotra | Dr. Ananya Rao   | 2026-10-15 10:30 | SCHEDULED
+ 59 | Aditya Bose     | Dr. Kavya Reddy  | 2026-10-15 10:30 | CHECKED_IN
+ 58 | Aarav Sharma    | Dr. Arjun Iyer   | 2026-10-15 10:30 | COMPLETED
+ 57 | Kabir Singh     | Dr. Kavya Reddy  | 2026-10-15 15:00 | COMPLETED
+ 56 | Ananya Das      | Dr. Rohan Kapoor | 2026-10-15 15:00 | SCHEDULED
+ 55 | Vivaan Malhotra | Dr. Vikram Mehta | 2026-10-15 15:00 | CHECKED_IN
+ 71 | Diya Patel      | Dr. Vikram Mehta | 2026-10-16 14:00 | SCHEDULED
+ 70 | Neha Kulkarni   | Dr. Kavya Reddy  | 2026-10-16 14:00 | SCHEDULED
+ 72 | Rahul Verma     | Dr. Ananya Rao   | 2026-10-16 14:00 | SCHEDULED
+(12 rows)
+
+    version_num    
+-------------------
+ 0002_appointments
+(1 row)
+

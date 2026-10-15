@@ -1,0 +1,178 @@
+ Image cliniccare-frontend:local Building 
+ Image cliniccare-backend:local Building 
+ Image cliniccare-backend:local Building 
+#1 reading from stdin 1.72kB done
+#1 DONE 0.0s
+
+#2 [frontend internal] load build definition from Dockerfile
+#2 DONE 0.1s
+
+#3 [migrate internal] load build definition from Dockerfile
+#3 DONE 0.1s
+
+#4 [backend] resolve image config for docker-image://docker.io/docker/dockerfile:1
+#4 DONE 1.5s
+
+#5 [backend] docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 CACHED
+
+#6 [migrate internal] load metadata for docker.io/library/python:3.14-slim@sha256:a2b82f3c48559aa0a8446d9af49826b6e2b2016f4cd2afabfe6013ec53729170
+#6 DONE 0.1s
+
+#7 [frontend internal] load metadata for docker.io/library/node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f
+#7 DONE 0.1s
+
+#8 [frontend internal] load metadata for docker.io/nginxinc/nginx-unprivileged:1.30-alpine@sha256:782bb89768cc87b7f95c18b95baa1af250e5d451f26794f59363540161147c01
+#8 DONE 0.1s
+
+#9 [migrate internal] load .dockerignore
+#9 DONE 0.0s
+
+#10 [frontend internal] load .dockerignore
+#10 DONE 0.0s
+
+#9 [migrate internal] load .dockerignore
+#9 DONE 0.0s
+
+#11 [frontend internal] load build context
+#11 DONE 0.0s
+
+#12 [migrate internal] load build context
+#12 DONE 0.1s
+
+#13 [backend build 1/3] FROM docker.io/library/python:3.14-slim@sha256:a2b82f3c48559aa0a8446d9af49826b6e2b2016f4cd2afabfe6013ec53729170
+#13 DONE 0.1s
+
+#14 [frontend runtime 1/3] FROM docker.io/nginxinc/nginx-unprivileged:1.30-alpine@sha256:782bb89768cc87b7f95c18b95baa1af250e5d451f26794f59363540161147c01
+#14 DONE 0.1s
+
+#15 [frontend build 1/6] FROM docker.io/library/node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f
+#15 DONE 0.1s
+
+#16 [migrate runtime 3/7] WORKDIR /app
+#16 CACHED
+
+#17 [migrate runtime 6/7] COPY alembic ./alembic
+#17 CACHED
+
+#18 [migrate build 2/3] COPY requirements.txt /tmp/requirements.txt
+#18 CACHED
+
+#19 [migrate runtime 4/7] COPY --from=build /opt/venv /opt/venv
+#19 CACHED
+
+#20 [migrate runtime 5/7] COPY alembic.ini ./
+#20 CACHED
+
+#21 [migrate runtime 2/7] RUN useradd --system --uid 10001 --no-create-home --shell /usr/sbin/nologin app
+#21 CACHED
+
+#22 [migrate build 3/3] RUN python -m venv /opt/venv  && /opt/venv/bin/pip install -r /tmp/requirements.txt
+#22 CACHED
+
+#23 [migrate runtime 7/7] COPY app ./app
+#23 CACHED
+
+#11 [frontend internal] load build context
+#11 DONE 0.0s
+
+#24 [migrate] exporting to image
+#24 exporting layers 0.0s done
+#24 exporting manifest sha256:fae56e2476cf666fdbf60395c6e74085630a003adbe6a2616b0ef7ea4dbfe83e done
+#24 exporting config sha256:669ec926f4feeb1c2bb86eb1b6fe879dcc006059f82ec145227ba15a07e652ea
+#24 ...
+
+#25 [frontend build 5/6] COPY . .
+#25 CACHED
+
+#26 [frontend build 2/6] WORKDIR /app
+#26 CACHED
+
+#27 [frontend build 3/6] COPY package.json package-lock.json ./
+#27 CACHED
+
+#28 [frontend build 6/6] RUN npm run build
+#28 CACHED
+
+#29 [frontend runtime 2/3] COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
+#29 CACHED
+
+#30 [frontend build 4/6] RUN npm ci --no-audit --no-fund
+#30 CACHED
+
+#31 [frontend runtime 3/3] COPY --from=build /app/dist /usr/share/nginx/html
+#31 CACHED
+
+#24 [migrate] exporting to image
+#24 exporting config sha256:669ec926f4feeb1c2bb86eb1b6fe879dcc006059f82ec145227ba15a07e652ea done
+#24 exporting attestation manifest sha256:b6fe3c52529de83b999e3cad12c9323a8ef94fb2ed1e029cd93e6dd570868705
+#24 exporting attestation manifest sha256:b6fe3c52529de83b999e3cad12c9323a8ef94fb2ed1e029cd93e6dd570868705 0.1s done
+#24 exporting manifest list sha256:e5b318a6df06347b06797904e1a0e8b2b6ed3aed0322f6232e481bc0b5336af5 0.1s done
+#24 naming to docker.io/library/cliniccare-backend:local
+#24 naming to docker.io/library/cliniccare-backend:local 0.0s done
+#24 unpacking to docker.io/library/cliniccare-backend:local 0.0s done
+#24 DONE 0.4s
+
+#32 [frontend] exporting to image
+#32 exporting layers 0.0s done
+#32 exporting manifest sha256:c916c84bf2fb2d36005fd46dd3277bdf26691250ae2e794de3e9ed7cd17029b3 0.0s done
+#32 exporting config sha256:3d7d00b7ed65329eb8156e1e925ec42974fdd798b9005e396181eac411939a0d 0.0s done
+#32 exporting attestation manifest sha256:2bd6b61392dde0237a77efd180451ad80679b212b15c8541a14e90d8952722ae 0.1s done
+#32 exporting manifest list sha256:170b43d8f131a3a00170f20d015793178f208d2fc8a4a3f7ce770e1b109343da 0.0s done
+#32 naming to docker.io/library/cliniccare-frontend:local done
+#32 unpacking to docker.io/library/cliniccare-frontend:local 0.1s done
+#32 DONE 0.5s
+
+#33 [backend] exporting to image
+#33 exporting layers 0.0s done
+#33 exporting manifest sha256:751aad8470ba1e6638d0924718a152fecdb1658f5f38abb4934fb889a99f1d2f 0.0s done
+#33 exporting config sha256:50de6cd539921255272e1a58a4b818399e6dceb4f322256af9c118ad036be58c 0.0s done
+#33 exporting attestation manifest sha256:13808077d1b3d0809e3535b486c07ce8ad3548757a0a2a818d6df9243d477fcd 0.1s done
+#33 exporting manifest list sha256:46a53775ee240b1b87c31ea5856945ca542f97ebdcba6333ef08e2b50baa48ca 0.1s done
+#33 naming to docker.io/library/cliniccare-backend:local 0.0s done
+#33 unpacking to docker.io/library/cliniccare-backend:local 0.0s done
+#33 DONE 0.5s
+
+#34 [migrate] resolving provenance for metadata file
+#34 DONE 0.1s
+
+#35 [backend] resolving provenance for metadata file
+#35 DONE 0.1s
+
+#36 [frontend] resolving provenance for metadata file
+#36 DONE 0.0s
+ Image cliniccare-backend:local Built 
+ Image cliniccare-backend:local Built 
+ Image cliniccare-frontend:local Built 
+ Network cliniccare_default Creating 
+ Network cliniccare_default Created 
+ Container cliniccare-postgres-1 Creating 
+ Container cliniccare-postgres-1 Created 
+ Container cliniccare-migrate-1 Creating 
+ Container cliniccare-migrate-1 Created 
+ Container cliniccare-backend-1 Creating 
+ Container cliniccare-backend-1 Created 
+ Container cliniccare-frontend-1 Creating 
+ Container cliniccare-frontend-1 Created 
+ Container cliniccare-postgres-1 Starting 
+ Container cliniccare-postgres-1 Started 
+ Container cliniccare-postgres-1 Waiting 
+ Container cliniccare-postgres-1 Healthy 
+ Container cliniccare-migrate-1 Starting 
+ Container cliniccare-migrate-1 Started 
+ Container cliniccare-migrate-1 Waiting 
+ Container cliniccare-migrate-1 Exited 
+ Container cliniccare-backend-1 Starting 
+ Container cliniccare-backend-1 Started 
+ Container cliniccare-backend-1 Waiting 
+ Container cliniccare-backend-1 Healthy 
+ Container cliniccare-frontend-1 Starting 
+ Container cliniccare-frontend-1 Started 
+ Container cliniccare-postgres-1 Waiting 
+ Container cliniccare-migrate-1 Waiting 
+ Container cliniccare-backend-1 Waiting 
+ Container cliniccare-frontend-1 Waiting 
+ Container cliniccare-backend-1 Healthy 
+ Container cliniccare-postgres-1 Healthy 
+ Container cliniccare-migrate-1 Exited 
+ Container cliniccare-frontend-1 Healthy 
