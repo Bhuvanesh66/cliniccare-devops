@@ -15,7 +15,7 @@ RUN npm run build
 
 # ---- runtime stage: nginx serves dist/; Node and node_modules are left behind ----
 # nginx-unprivileged runs as uid 101 and listens on 8080 instead of 80.
-FROM nginxinc/nginx-unprivileged:1.30-alpine@sha256:782bb89768cc87b7f95c18b95baa1af250e5d451f26794f59363540161147c01 AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e AS runtime
 
 # Rendered by the image entrypoint at start-up (envsubst of ${BACKEND_URL}).
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
